@@ -8,7 +8,7 @@ fn parse() -> Vec<String> {
 fn expand(lines: &mut Vec<String>) {
     let mut i = 0;
     while i < lines.len() {
-        let line = lines.get(i).unwrap();
+        let line = &lines[i];
         if line.chars().all(|x| x == '.') {
             lines.insert(i, ".".repeat(line.len()));
             i += 1;
@@ -17,7 +17,7 @@ fn expand(lines: &mut Vec<String>) {
     }
 
     i = 0;
-    while i < lines.get(0).unwrap().len() {
+    while i < lines[0].len() {
         if lines.iter().all(|line| line.chars().nth(i).unwrap() == '.') {
             lines.iter_mut().for_each(|line| line.insert(i, '.'));
             i += 1;
@@ -47,9 +47,9 @@ fn main() {
 
     let mut sum = 0;
     for i in 0..galaxies.len() {
-        let p = galaxies.get(i).unwrap();
+        let p = &galaxies[i];
         for j in i + 1..galaxies.len() {
-            let other = galaxies.get(j).unwrap();
+            let other = &galaxies[j];
             sum += distance(p, other);
         }
     }
