@@ -1,4 +1,4 @@
-use std::{char, collections::HashMap};
+use std::collections::HashMap;
 
 fn parse() -> Vec<Vec<char>> {
     include_str!("../input")
@@ -43,9 +43,19 @@ fn invert(direction: char) -> char {
     }
 }
 
-fn walk(map: &Vec<Vec<char>>, mut pos: (usize, usize), mut coming_from: char) -> u32 {
-    let mut distance = 0;
+fn main() {
+    let map = parse();
+    let mut polygon: Vec<(usize, usize)> = Vec::new();
+
+    let mut pos = start_pos(&map).unwrap();
+    polygon.push(pos);
+
+    pos = (pos.0, pos.1 + 1);
+    let mut coming_from = 'W';
+
+    let mut _distance = 0;
     loop {
+        polygon.push(pos);
         let cur = char_at(&map, pos);
 
         match next(cur, coming_from) {
@@ -59,19 +69,28 @@ fn walk(map: &Vec<Vec<char>>, mut pos: (usize, usize), mut coming_from: char) ->
                 };
                 coming_from = invert(direction);
             }
-            None => return (distance as f32 / 2.0).round() as u32,
+            None => break,
         }
 
-        distance += 1;
+        _distance += 1;
     }
-}
+    // println!("{}", (distance as f32 / 2.0).round() as u32);
 
-fn main() {
-    let map = parse();
-
-    let mut pos = start_pos(&map).unwrap();
-    pos = (pos.0, pos.1 + 1);
-    let coming_from = 'W';
-
-    println!("{}", walk(&map, pos, coming_from));
+    let mut score = 0;
+    for line in map.iter().enumerate() {
+        let mut hits = 0;
+        let mut buf = 0;
+        for c in line.1.iter().enumerate() {
+            let pos = (line.0, c.0);
+            if polygon.contains(&pos) {
+                hits += 1;
+            } else if hits % 2 == 1 && *c.1 == '.' {
+                buf += 1;
+            } else if hits > 0 && hits % 2 == 0 {
+                score += buf;
+                buf = 0;
+            }
+        }
+    }
+    println!("{}", score);
 }
